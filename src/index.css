@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+html, body { scrollbar-gutter: stable; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  background-color:#f6f8f8;
+}
