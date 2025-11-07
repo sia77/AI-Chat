@@ -1,6 +1,27 @@
+import { useState } from "react";
 import { SendButton } from "./SendButton";
 
-export const MessageInput = () => {
+type MessageInputProps = {
+  onSend: (message: string) => void;
+};
+
+export const MessageInput = ({onSend}:MessageInputProps) => {
+
+    const [message, setMessage] = useState("");
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    }
+
+    const handleSend = () => {
+        if(!message.trim()) return;
+        onSend(message);
+        setMessage(""); 
+    }
+
     return (
         <div
             className="
@@ -20,15 +41,16 @@ export const MessageInput = () => {
                     focus:outline-none
                     resize-none
                 "
+                value = { message }
+                onKeyDown={ handleKeyDown }
+                onChange={(e)=> setMessage(e.target.value)}
                 placeholder="Type your message..."
                 ></textarea>
 
-                
                 <div className="absolute right-3 bottom-3">
-                <SendButton />
+                <SendButton onClick={handleSend}  />
                 </div>
             </div>
-
         </div>
     )
 }

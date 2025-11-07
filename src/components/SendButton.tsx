@@ -1,10 +1,15 @@
 
 import { Play } from "lucide-react";
 
-export const SendButton = () => {
+type SendButtonProps = {
+    onClick: () => void;
+};
+
+export const SendButton = ({onClick}:SendButtonProps) => {
 
     return (
-        <button>
+        <button 
+            onClick = {onClick}>
             <Play color="#3e9392" />
         </button>
         

@@ -6,3 +6,48 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif; 
   background-color:#f6f8f8;
 }
+
+.markdown p {
+  margin-bottom: 0.75rem; /* add spacing between paragraphs */
+  line-height: 1.5;
+}
+.markdown br {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.markdown ul,
+.markdown ol {
+  margin-left: 1.25rem;   /* indentation */
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.25rem;
+}
+
+/* Unordered list (• bullets) */
+.markdown ul {
+  list-style-type: disc;
+}
+
+/* Ordered list (1., 2., 3., etc.) */
+.markdown ol {
+  list-style-type: decimal;
+}
+
+/* Individual list items */
+.markdown li {
+  margin-bottom: 0.25rem;
+  line-height: 1.5;
+}
+
+
+.markdown li::marker {
+  color: #fff; 
+}
+
+.markdown hr {
+  /* margin: 1rem auto 1rem auto;
+  width:50%;
+  color:gray; */
+  display:none;
+}
