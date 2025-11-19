@@ -2,7 +2,8 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
-import type { Message } from "../types/types"; // adjust import to your project
+import type { Message } from "../types/types"; 
+
 
 const remarkPlugins = [remarkGfm, remarkBreaks];
 
@@ -11,24 +12,10 @@ type MessageProps = {
 };
 
 export const MessageItem = ({ message }: MessageProps) => {
-//   // normalize CRLF -> LF and ensure we always have a string
-//     const raw = (message.text ?? "")
-//     .replace(/\\n/g, "\n")  // converts literal "\n" into real newlines
-//     .replace(/\r\n/g, "\n");
-
-//   // Only tweak formatting for AI messages (optional)
-//   const formattedText =
-//     message.sender === "ai"
-//       ? // collapse 2+ newlines to exactly 2 (keeps paragraph spacing predictable)
-//         raw.replace(/\n{2,}/g, "\n\n")
-//       : raw;
-
-    //   console.log("raw: ", JSON.stringify(message));
-    //   console.log("Formatted: ", JSON.stringify(message));  
 
   return (
     <>
-      {message.sender === "user" ? (
+      {message.role === "user" ? (
         <div className="flex justify-end mb-2">
           <div className="relative max-w-[75%] bg-blue-500 text-white p-3 rounded-lg shadow">
             <ReactMarkdown remarkPlugins={remarkPlugins}>

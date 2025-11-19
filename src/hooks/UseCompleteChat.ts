@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Message } from "../types/types";
     
-    export const useJsonService = () => {
+    export const useCompleteChat = () => {
 
         const base_url = import.meta.env.VITE_BASE_URL;
 
@@ -9,11 +9,11 @@ import type { Message } from "../types/types";
 
         const handleSend = async(message:string) => {
 
-            setMessages(prevMsg => [...prevMsg, {sender:'user', text:message}]);
-            setMessages(prev => [...prev, { sender: "ai", text: "..." }]);
+            setMessages(prevMsg => [...prevMsg, { role:'user', text:message}]);
+            setMessages(prev => [...prev, { role: "model", text: "..." }]);
 
             try{
-                const response = await fetch(`${base_url}/api/query`, {
+                const response = await fetch(`${base_url}/api/chat/complete`, {
                     method: "POST", 
                     headers: { "Content-Type": "application/json"},
                     body: JSON.stringify({ prompt: message, temperature: 0.7 })
@@ -23,7 +23,7 @@ import type { Message } from "../types/types";
                     const errorBody = await response.json().catch(() => ({}));
                     setMessages(prev => [
                         ...prev,
-                        { sender: "ai", text: errorBody.detail || "Server error" },
+                        { role: "model", text: errorBody.detail || "Server error" },
                     ]);
                     throw new Error(errorBody.detail || `HTTP ${response.status}`);
                 }                
@@ -34,7 +34,7 @@ import type { Message } from "../types/types";
                     return prevMsg.filter(message => message.text !== "...");
                 });
 
-                setMessages(prevMsg => [...prevMsg, {sender:'ai', text:data.generated_text}])
+                setMessages(prevMsg => [...prevMsg, {role:'model', text:data.generated_text}])
 
             }catch(error:any){
                 console.log("Error sending message: ", error);

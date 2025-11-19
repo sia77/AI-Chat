@@ -1,11 +1,10 @@
 import { MessageInput } from "./MessageInput"
 import { MessageList } from "./MessageList"
-import { useStreamService } from "../hooks/StreamService"
-
+import { useStreamWithHistory } from "../hooks/useStreamWithHistory";
 
 export const ChatWindow = () => {
 
-    const { messages, handleSend } = useStreamService();
+    const { messages, handleSend } = useStreamWithHistory();
 
     return (       
 
