@@ -9,7 +9,7 @@ export const useStreamWithHistory = () => {
 
         setMessages(prevMsg => [...prevMsg, {role:'user', text:message}])
 
-        try{
+        try {
             const response = await fetch(`${base_url}/api/chat/stream`,
                 {
                     method:"POST",
