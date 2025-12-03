@@ -20,10 +20,9 @@ export const UseStreamSSE = () => {
 
     // This useEffect manages the SSE connection lifecycle
     useEffect(() => {
-        // Only run if there is a pending prompt to send
         if (!pendingPrompt) return; 
 
-        // 1. Build the full prompt/history for the server
+        // We are not passing back the chat history as there is length limitation GET query
         const url = `${base_url}/api/chat/stream/sse?prompt=${encodeURIComponent(pendingPrompt)}`;
         
         const sse = new EventSource(url);
@@ -31,10 +30,8 @@ export const UseStreamSSE = () => {
 
         sse.onmessage = (e) => {
             try {
-                // Assuming the server streams text chunks
                 const data = JSON.parse(e.data);
                 
-                // Accumulate text
                 accumulatedText += data.text; 
 
                 // 2. Update the *last* model message with the streaming data
@@ -66,8 +63,7 @@ export const UseStreamSSE = () => {
         };
 
     }, [pendingPrompt, base_url]); 
-    // Dependency: Reruns the connection logic whenever a new prompt is sent
-
+    
     return { messages, handleSend };
 }
 
