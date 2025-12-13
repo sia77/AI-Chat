@@ -1,11 +1,11 @@
 import { MessageInput } from "./MessageInput"
 import { MessageList } from "./MessageList"
-import { UseStreamSSE } from "../hooks/UseStreamSSE";
+import { UseStreamJsonMultipeCandidates } from "../hooks/UseStreamJsonMultipeCandidates";
 
 
 export const ChatWindow = () => {
 
-    const { messages, handleSend } = UseStreamSSE();
+    const { messages, handleSend } = UseStreamJsonMultipeCandidates();
 
     return (       
 

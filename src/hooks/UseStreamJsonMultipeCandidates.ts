@@ -10,10 +10,10 @@ export const UseStreamJsonMultipeCandidates = () => {
     const localHistory = [...messages, {role: 'user', text: message}];
 
     // update UI immediately with user message and placeholder for model
-    setMessages(prev => [...prev, {role: 'user', text: message}, {role: 'model', text: ""}]);
+    setMessages(prev => [...prev, {role: 'user', text: message}, {role: 'model', text: '...'}]);
 
     try {
-      const response = await fetch(`${base_url}/api/chat/stream/json`, {
+      const response = await fetch(`${base_url}/api/v1/chat/stream/json`, {
         headers: {"Content-Type": "application/json"},
         method: "POST",
         body: JSON.stringify({prompt: message, temperature: 0.7, history: localHistory})
@@ -31,7 +31,7 @@ export const UseStreamJsonMultipeCandidates = () => {
       let buffer = "";
 
       // Keep reference to index of the placeholder model message (last item)
-      // We inserted user message then a model placeholder, so placeholder index is current length-1
+      // A user message and a model placeholder were inserted, so placeholder index is current length-1
       let placeholderIndex = (messages.length + 1);
 
       while (true) {

@@ -23,7 +23,7 @@ export const UseStreamSSE = () => {
         if (!pendingPrompt) return; 
 
         // We are not passing back the chat history as there is length limitation GET query
-        const url = `${base_url}/api/chat/stream/sse?prompt=${encodeURIComponent(pendingPrompt)}`;
+        const url = `${base_url}/api/v1/chat/stream/sse?prompt=${encodeURIComponent(pendingPrompt)}`;
         
         const sse = new EventSource(url);
         let accumulatedText = ''; // To collect the streamed text chunks
