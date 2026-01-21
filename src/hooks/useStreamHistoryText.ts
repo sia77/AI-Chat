@@ -1,7 +1,8 @@
+//This version receives the response as chuncks of streams with history
 import { useState } from "react";
 import type { Message } from "../types/types";
 
-export const useStreamWithHistory = () => {
+export const useStreamHistoryText = () => {
     const base_url = import.meta.env.VITE_BASE_URL;
     const [messages, setMessages] = useState<Message[]>([]);    
 
@@ -10,7 +11,7 @@ export const useStreamWithHistory = () => {
         setMessages(prevMsg => [...prevMsg, {role:'user', text:message}])
 
         try {
-            const response = await fetch(`${base_url}/api/v1/chat/stream`,
+            const response = await fetch(`${base_url}/api/v1/chat/stream/text`,
                 {
                     method:"POST",
                     headers: {"Content-Type": "application/json"},

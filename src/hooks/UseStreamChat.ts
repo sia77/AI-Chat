@@ -1,3 +1,4 @@
+//This version receives the response as chuncks of streams, with no history
 import { useState } from "react";
 import type { Message } from "../types/types";
 

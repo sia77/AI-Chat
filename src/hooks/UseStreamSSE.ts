@@ -1,3 +1,5 @@
+//This version receives the response as SSE and don't allow for history as this only allows for GET methods.
+//There are ways around this, however, SSE is not designed for POST as per design
 import { useEffect, useState } from "react";
 import type { Message } from "../types/types"
 

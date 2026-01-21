@@ -1,7 +1,8 @@
+//This version receives the response as chuncks of streams with history
 import { useState } from "react"
 import type { Message } from "../types/types"
 
-export const UseStreamWithHistoryJson = () => {
+export const UseStreamHistoryJson = () => {
     const base_url = import.meta.env.VITE_BASE_URL;
     const [messages, setMessages] = useState<Message[]>([])
 
