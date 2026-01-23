@@ -48,7 +48,7 @@ export const MessageInput = ({onSend}:MessageInputProps) => {
                 ></textarea>
 
                 <div className="absolute right-3 bottom-3">
-                <SendButton onClick={handleSend}  />
+                    <SendButton onClick={handleSend}  />
                 </div>
             </div>
         </div>

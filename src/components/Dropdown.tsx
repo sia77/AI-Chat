@@ -12,15 +12,15 @@ type DropdownProps = {
 
 
 export const Dropdown = ({items}:DropdownProps) => {
-    const [open, setOpen] = useState(false);   
+    const [open, setOpen] = useState(false);  
 
 
 
     return(
         <div className="text-right mr-10 mt-3 relative inline-block">
             <button className="cursor-pointer" onClick={() => setOpen(!open)}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-10 rounded-md hover:bg-[#abc7eb] text-amber-700 hover:text-[#ca5b0f]">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-10 rounded-md hover:bg-[#abc7eb] text-amber-700 hover:text-[#ca5b0f]">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
                 </svg>                
             </button>
 
