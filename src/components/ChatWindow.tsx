@@ -10,7 +10,7 @@ export const ChatWindow = () => {
     //const [mode, setMode] = useState<StreamMode>("text")
     const [mode, setMode] = useState("sse")
     //const { messages, handleSend } = useStreamHistoryText();
-    const { messages, handleSend } = useLLMHook( mode);
+    const { messages, handleSend, handleStop, isLoading } = useLLMHook( mode);
 
     return (       
 
@@ -27,7 +27,10 @@ export const ChatWindow = () => {
                     ]}
                 />
                 <MessageList messageList = {messages} />    
-                <MessageInput onSend = {handleSend}/>                
+                <MessageInput 
+                    onSend = {handleSend}
+                    isLoading = {isLoading}
+                    handleStop = { handleStop} />                
             </div>
         </>
 

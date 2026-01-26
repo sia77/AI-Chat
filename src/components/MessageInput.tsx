@@ -3,9 +3,11 @@ import { SendButton } from "./SendButton";
 
 type MessageInputProps = {
   onSend: (message: string) => void;
+  isLoading: boolean;
+  handleStop: () => void;
 };
 
-export const MessageInput = ({onSend}:MessageInputProps) => {
+export const MessageInput = ({onSend, isLoading, handleStop}:MessageInputProps) => {
 
     const [message, setMessage] = useState("");
 
@@ -48,7 +50,10 @@ export const MessageInput = ({onSend}:MessageInputProps) => {
                 ></textarea>
 
                 <div className="absolute right-3 bottom-3">
-                    <SendButton onClick={handleSend}  />
+                    <SendButton 
+                        onClick = {handleSend} 
+                        isLoading = {isLoading} 
+                        onStop = {handleStop}  />
                 </div>
             </div>
         </div>

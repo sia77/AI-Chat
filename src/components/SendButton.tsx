@@ -1,20 +1,20 @@
 
-import { Play } from "lucide-react";
+import { Play, Square } from "lucide-react";
 
 type SendButtonProps = {
     onClick: () => void;
+    isLoading: boolean;
+    onStop: () => void;
 };
 
-export const SendButton = ({onClick}:SendButtonProps) => {
+export const SendButton = ({onClick, isLoading, onStop}:SendButtonProps) => {
 
-    return (
-        <button 
-            onClick = {onClick}>
-            <Play color="#3e9392" />
-        </button>
-        
-    )
+const icon = isLoading ? <Square color="#373737" /> : <Play color="#3e9392" />;
+const action = isLoading ? onStop : onClick;
 
-
-
+return (
+  <button className="cursor-pointer" onClick={action}>
+    {icon}
+  </button>
+);
 }
