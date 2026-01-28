@@ -20,6 +20,10 @@ export const useLLMHook = (mode:string) => {
 
     const handleSend = (userPrompt:string) => {
         if (isLoading) return;
+        // KILL any existing stream just in case
+        if (stopStreamRef.current) {
+            stopStreamRef.current();
+        }
         setIsLoading(true);        
         setMessages(prev => [...prev, {role:"user", text:userPrompt}, {role:"model", text:''}]);
 
@@ -31,6 +35,11 @@ export const useLLMHook = (mode:string) => {
                     setIsLoading(true);
                     setMessages(prev => {
                         const lastMessage = prev[prev.length -1];
+                        // If for some reason the placeholder isn't there yet, 
+                        // we append a new message instead of trying to edit 'undefined'
+                        if (!lastMessage || lastMessage.role !== "model") {
+                            return [...prev, { role: "model", text: text }];
+                        }
                         const otherMessages = prev.slice(0, -1); //Create shallow copy
                         return  [...otherMessages, {...lastMessage, text:lastMessage.text+text}];
                     })

@@ -1,9 +1,8 @@
-//This version receives the response as SSE and don't allow for history as this only allows for GET methods.
-//There are ways around this, however, SSE is not designed for POST as per design
+//This version receives the response as SSE events
 
 export type SSEHandlers = {
     onChunk: (text:string) => void;
-    onError?:(err: unknown) => void;
+    onError?:(err: string) => void;
     onDone?:() => void;
 }
 
@@ -13,27 +12,30 @@ export const streamSSE = (baseURL: string, prompt:string, handlers:SSEHandlers) 
     const url = `${baseURL}/api/v1/chat/stream/sse?prompt=${encodeURIComponent(prompt)}`;
 
     const sse = new EventSource(url);
-    
-    sse.onmessage = (e) => {
-        // if (e.data === '[DONE]') {
-        //     handlers.onDone?.();
-        //     sse.close();
-        //     return;
-        // }
 
-        try {
-            const data = JSON.parse(e.data);
-            if(data.text) handlers.onChunk(data.text)
-        } catch (err) {
-            console.error("Malformed JSON received");
-            handlers.onError?.(new Error("Malformed JSON received"));
+    sse.addEventListener("chunk", (e)=> {
+        try { 
+            const { text } = JSON.parse(e.data); 
+            handlers.onChunk(text); 
+        } 
+        catch { 
+            handlers.onError?.("Malformed JSON received"); 
         }
-    };
+    })
 
-    // Handle connection close/error
-    sse.onerror = (err) => {        
-        sse.close();
-        handlers.onError?.(err);        
+    sse.addEventListener("done", ()=> {
+        handlers.onDone?.()
+    })
+
+    sse.addEventListener("sse_error", (e) =>{
+        const { message } = JSON.parse(e.data); 
+        handlers.onError?.(message);
+    });
+
+    // Built-in connection error 
+    sse.onerror = (err:unknown) => { 
+        handlers.onError?.("Connection lost"); 
+        sse.close(); 
     };
 
     return () => sse.close();
