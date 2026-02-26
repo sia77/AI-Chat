@@ -3,6 +3,7 @@ import { MessageList } from "./MessageList"
 import { Dropdown } from "./Dropdown";
 import { useState } from "react";
 import { useLLMHook } from "../hooks/useLLMHook";
+import { SidePanel } from "./SidePanel";
 
 ///type StreamMode = "complete" | "stream-stateless-text" | "stream-text" | "stream-json" | "sse";
 
@@ -15,9 +16,13 @@ export const ChatWindow = () => {
     return (       
 
         <>
+            <div>
+                
+            </div>
             <div className="flex flex-col h-screen bg-blue-100">
+                <SidePanel />
                 {/* <TopMenu /> */}
-                <Dropdown 
+                {/* <Dropdown 
                     items={[
                     { label: "Complete response", onClick: () => { setMode("complete") } },
                     { label: "Stream (no history, text)", onClick: () => { setMode("stream") } },
@@ -25,7 +30,7 @@ export const ChatWindow = () => {
                     { label: "Stream (with history, text)", onClick: () => { setMode("t_history") } },
                     { label: "SSE stream (text)", onClick: () => { setMode("sse") } },
                     ]}
-                />
+                /> */}
                 <MessageList messageList = {messages} />    
                 <MessageInput 
                     onSend = {handleSend}
