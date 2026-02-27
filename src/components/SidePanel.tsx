@@ -32,13 +32,14 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
                         current={props.selectedResponseType}
                         onChange={(e: any) => props.setSelectedResponseType(e.target.value)}
                     />
-                    <hr className="my-2 w-[60%] opacity-10" />
+                    <hr className="w-[60%] opacity-10 mt-2 mb-4" />
                     <RadioGroup
-                        groupLable="Media Type"
+                        groupLabel="Media Type"
                         name="media"
                         options = {MEDIA_OPTIONS}
                         current = {props.selectedMediaType}
                         onChange = { (e:any) => props.setSelectedMediaType(e.target.value)}
+                        disabledValue={props.selectedResponseType === 'sse' ? 'text' : null}
                     />
                 </form>
             </div>

@@ -27,15 +27,7 @@ export const ChatWindow = () => {
                     setSelectedMediaType = { setSelectedMediaType } />
                 
                 {/* <TopMenu /> */}
-                {/* <Dropdown 
-                    items={[
-                    { label: "Complete response", onClick: () => { setMode("complete") } },
-                    { label: "Stream (no history, text)", onClick: () => { setMode("stream") } },
-                    { label: "Stream (with history, JSON)", onClick: () => { setMode("j_history") } },
-                    { label: "Stream (with history, text)", onClick: () => { setMode("t_history") } },
-                    { label: "SSE stream (text)", onClick: () => { setMode("sse") } },
-                    ]}
-                /> */}
+
                 <MessageList messageList = {messages} />    
                 <MessageInput 
                     onSend = {handleSend}

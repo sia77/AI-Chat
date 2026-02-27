@@ -3,12 +3,12 @@
 export const RadioGroup = ({groupLabel, options, name, current, onChange, disabledValue}:any) => {
     
     return(
-        <div className="mb-4">
+        <div className="">
             <p className="font-bold text-xs uppercase text-gray-400 mb-2">{ groupLabel }</p>
             {options.map( (opt:any) =>(
                 <div key={opt.id}>
                     <div className = "">
-                        <label htmlFor={opt.id} className="text-gray-800">
+                        <label htmlFor={opt.id} className="text-gray-800 text-sm">
                             <input
                                 type = "radio" 
                                 id = {opt.id} 
