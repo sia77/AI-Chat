@@ -1,16 +1,16 @@
 import { MessageInput } from "./MessageInput"
 import { MessageList } from "./MessageList"
-import { Dropdown } from "./Dropdown";
 import { useState } from "react";
 import { useLLMHook } from "../hooks/useLLMHook";
 import { SidePanel } from "./SidePanel";
-
-///type StreamMode = "complete" | "stream-stateless-text" | "stream-text" | "stream-json" | "sse";
 
 export const ChatWindow = () => {
     //const [mode, setMode] = useState<StreamMode>("text")
     const [mode, setMode] = useState("sse")
     //const { messages, handleSend } = useStreamHistoryText();
+
+    const [selectedResponse, setSelectedResponse] = useState('stream');
+    const [selectedMediaType, setSelectedMediaType] = useState('json');
     const { messages, handleSend, handleStop, isLoading } = useLLMHook( mode);
 
     return (       
@@ -20,7 +20,12 @@ export const ChatWindow = () => {
                 
             </div>
             <div className="flex flex-col h-screen bg-blue-100">
-                <SidePanel />
+                <SidePanel 
+                    selectedResponseType = {selectedResponse}
+                    setSelectedResponseType = { setSelectedResponse}
+                    selectedMediaType = {selectedMediaType}
+                    setSelectedMediaType = { setSelectedMediaType } />
+                
                 {/* <TopMenu /> */}
                 {/* <Dropdown 
                     items={[

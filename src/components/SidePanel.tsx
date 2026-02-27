@@ -1,20 +1,18 @@
 import { useState } from "react"
 import { Settings } from 'lucide-react';
+import { RadioGroup } from "./RadioGroup";
+import { MEDIA_OPTIONS, RESPONSE_OPTIONS } from "../config/panelOptions";
 
+interface SidePanelProps {
+    selectedResponseType:string;
+    setSelectedResponseType: (val:string) => void;
+    selectedMediaType:string;
+    setSelectedMediaType: (val:string) => void;
+}
 
-export const SidePanel = () => {
+export const SidePanel = ({ ...props }: SidePanelProps) => {
 
     const [open, setOpen] = useState(false);
-    const [selectedResponse, setSelectedResponse] = useState('stream');
-    const [selectedMediaType, setSelectedMediaType] = useState('json');
-
-    const handleChangeResponse = (event:any) => {
-        setSelectedResponse(event.target.value);
-    }
-
-    const handleChangeMediaType = (event:any) => {
-        setSelectedMediaType(event.target.value);
-    }
 
     return (
         <div className="text-left ml-5 mt-3 relative inline-block">
@@ -27,52 +25,22 @@ export const SidePanel = () => {
           open ? 'translate-x-0' : '-translate-x-full'
         }`} >
                 <form>
-                    <div>
-                        <div className = "">
-                            <label htmlFor="stream">
-                                <input className="mr-2" type="radio" id="stream" name="response" value="stream" checked = {selectedResponse === 'stream'} onChange={handleChangeResponse} />
-                                Stream
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <div className = "">
-                            <label htmlFor="complete">
-                                <input className="mr-2" type="radio" id="complete" name="response" value="complete" checked = {selectedResponse === 'complete'} onChange={handleChangeResponse} />
-                                Complete
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className = "">
-                            <label htmlFor="sse">
-                                <input className="mr-2" type="radio" id="sse" name="response" value="sse" checked = {selectedResponse === 'sse'} onChange={handleChangeResponse} />
-                                SSE
-                            </label>
-                        </div>
-                    </div>
+                    <RadioGroup
+                        groupLabel="Response Type"
+                        name="response"
+                        options = {RESPONSE_OPTIONS}
+                        current={props.selectedResponseType}
+                        onChange={(e: any) => props.setSelectedResponseType(e.target.value)}
+                    />
                     <hr className="my-2 w-[60%] opacity-10" />
-                    <div>
-                        <div className = "">
-                            <label htmlFor="json">
-                                <input type="radio" className="mr-2" id='json' name="mediaType" value="json" checked = {selectedMediaType === 'json'} onChange = {handleChangeMediaType} />
-                                Json
-                            </label>                            
-                        </div>                        
-                    </div>
-                    <div>                
-                        <div className = "">
-                            <label htmlFor="text">
-                                <input type="radio" className="mr-2" id="text" name="mediaType" value="text" checked = {selectedMediaType === 'text'} onChange = {handleChangeMediaType} disabled = {selectedResponse === 'sse'} />
-                            Text
-                            </label>
-                        </div>
-                    </div>
-
+                    <RadioGroup
+                        groupLable="Media Type"
+                        name="media"
+                        options = {MEDIA_OPTIONS}
+                        current = {props.selectedMediaType}
+                        onChange = { (e:any) => props.setSelectedMediaType(e.target.value)}
+                    />
                 </form>
-
-
             </div>
         </div>
     )
