@@ -3,14 +3,6 @@ export type Message = {
     text: string
 }
 
-type DeliveryMode = "stream" | "complete";
-type HistoryMode = "stateless" | "with-history";
-type ResponseFormat = "text" | "json";
-type Transport = "fetch" | "sse";
-
-export interface LLMMode {
-  delivery: DeliveryMode;
-  history: HistoryMode;
-  format: ResponseFormat;
-  transport?: Transport;
-}
+export type MediaType = 'json' | 'text';
+export type ResponseTypeLLM = 'stream' | 'complet' | 'sse';
+export type PanelMode = 'closed' | 'floating' | 'docked';

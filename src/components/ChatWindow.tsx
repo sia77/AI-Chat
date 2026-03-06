@@ -1,30 +1,46 @@
 import { MessageInput } from "./MessageInput"
 import { MessageList } from "./MessageList"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLLMHook } from "../hooks/useLLMHook";
 import { SidePanel } from "./SidePanel";
+import type { MediaType, PanelMode, ResponseTypeLLM } from "../types/types";
+import { useRef } from 'react';
+
 
 export const ChatWindow = () => {
-    //const [mode, setMode] = useState<StreamMode>("text")
-    const [mode, setMode] = useState("sse")
-    //const { messages, handleSend } = useStreamHistoryText();
+    const [selectedResponse, setSelectedResponse] = useState<ResponseTypeLLM>('stream');
+    const [selectedMediaType, setSelectedMediaType] = useState<MediaType>('json');
+    const {messages, handleSend, handleStop, isLoading } = useLLMHook( selectedResponse, selectedMediaType );
+    const [panelMode, setPanelMode] = useState<PanelMode>('closed');
+    const panelRef = useRef<HTMLDivElement>(null);
 
-    const [selectedResponse, setSelectedResponse] = useState('stream');
-    const [selectedMediaType, setSelectedMediaType] = useState('json');
-    const { messages, handleSend, handleStop, isLoading } = useLLMHook( mode);
+    useEffect(()=>{
+
+        const handleClickOutside = () => {
+            if(
+                panelMode === 'floating' &&
+                panelRef.current &&
+                !panelRef.current.contains(event?.target as Node)){
+                setPanelMode('closed');
+            }        
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);        
+    },[panelMode]);
 
     return (       
 
         <>
-            <div>
-                
-            </div>
             <div className="flex flex-col h-screen bg-blue-100">
-                <SidePanel 
+                <SidePanel
+                    panelRef = {panelRef} 
                     selectedResponseType = {selectedResponse}
                     setSelectedResponseType = { setSelectedResponse}
                     selectedMediaType = {selectedMediaType}
-                    setSelectedMediaType = { setSelectedMediaType } />
+                    setSelectedMediaType = { setSelectedMediaType }
+                    panelMode = { panelMode }
+                    setPanelMode = {setPanelMode} />
                 
                 {/* <TopMenu /> */}
 
