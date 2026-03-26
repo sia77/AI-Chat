@@ -25,8 +25,6 @@ export const fetchCompleteData = async(
             throw new Error("Something went wrong communicating with API")// || `HTTP ${response.status}`);
         }
 
-
-
         if(mediaType === 'json'){
             return await response.json();
         }else{
@@ -35,9 +33,9 @@ export const fetchCompleteData = async(
 
     }catch(err:any) {
 
-        if(err.name === 'AbortError' ){
-            console.log("User aborted fetch");
-            return null;
+        if(err.name === 'AbortError' || err.message === 'Aborted'){
+            console.log("Generator level: Abort detected.");
+            throw err;  //Re-throw so handleSend deals with it.
         }else{
             console.error("Fetch failed:", err);
             throw err;

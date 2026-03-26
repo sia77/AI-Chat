@@ -5,7 +5,6 @@ import { RESPONSE_OPTIONS } from "../config/panelOptions";
 import { fetchCompleteData } from "../services/fetchCompleteData";
 import { fetchStreamData } from "../services/fetchStreamData";
 
-
 export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:MediaType) => {
     const base_url = import.meta.env.VITE_BASE_URL;
     const [messages, setMessages] = useState<Message[]>([]);
@@ -13,31 +12,31 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
     const stopStreamRef = useRef<(() => void) | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-
+    //Stream
     if( selectedResponse === RESPONSE_OPTIONS[0].id ){
 
-        
-
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
-
         const handleStop = () => {
-
+            if(abortControllerRef.current){
+                abortControllerRef.current.abort();
+                abortControllerRef.current = null;
+                setIsLoading(false);        
+            }
         };
-
 
         const handleSend = async(userPrompt:string) =>{
 
             if(isLoading) return;
 
-            const newMessage:Message = { role:"user", text:userPrompt}
-            const botPlaceholder:Message = { role:"model", text:"..."}
+            const controller = new AbortController();
+            abortControllerRef.current = controller;
+
+            const newMessage:Message = { role:"user", text:userPrompt }
+            const botPlaceholder:Message = { role:"model", text:"..." }
             
-            setMessages((prev:Message[])=> [...prev, newMessage, botPlaceholder]);
-            
+            setMessages((prev:Message[])=> [...prev, newMessage, botPlaceholder]);            
             
             const localHistory:Message[] = [...messages, newMessage ];
-
+            const cleanHistory = localHistory.filter(m => ["user", "model"].includes(m.role));
             setIsLoading(true);
 
             try{
@@ -45,7 +44,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                     base_url,
                     selectedMediaType,
                     userPrompt,
-                    localHistory,
+                    cleanHistory,
                     controller.signal
                 )
 
@@ -56,7 +55,6 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                         (chunk as any).text : chunk;
                     setMessages(prev =>{
                         const lastIndex = prev.length - 1;
-
 
                         if(prev[lastIndex]?.role === "model"){
                             const newArray = [...prev];
@@ -70,38 +68,46 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 }
 
             }catch(err:any){
+                if(err.name === 'AbortError' || err.message === 'Aborted'){
+                    console.log("You stopped this response");
+                    
+                    setMessages((prev:Message[])=>{
+                        if (!prev.length) return prev;
+                        return [...prev, { role:"system", text:"You stopped this response" }];
+                    });
+                    return;
+                }
+
                 console.log("Error: ", err);
-                setMessages((prev:Message[])=>{
-                    const lastItemRemoved = prev.slice(0,-1);
-                    return [...lastItemRemoved, { role:"model", text:"Sorry, I ran into an issue. Please try again." }];
-                } )
+
+                setMessages((prev: Message[]) => [
+                    ...prev.slice(0, -1),
+                    { role: "error", text: "Sorry, I ran into an issue. Please try again." }
+                ]);
 
             }finally{
                 setIsLoading(false);
-            }
-            
+            }            
         }
 
         return { messages, handleSend, handleStop, isLoading }
 
-
+    //Complete
     }else if(selectedResponse === RESPONSE_OPTIONS[1].id){
-
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
-
         
         const handleStop = () => {
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort(); 
                 abortControllerRef.current = null;
-                setIsLoading(false);
-                console.log("Stream stopped by user");
+                setIsLoading(false);               
             }
         };
         
         const handleSend = async(userPrompt:string) => {
             if(isLoading) return;
+
+            const controller = new AbortController();
+            abortControllerRef.current = controller;
             
             setIsLoading(true);
 
@@ -111,12 +117,13 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
             setMessages(prev => [...prev, newMessage, botPlaceholder]);
             const localHistory:Message[] = [...messages, newMessage];
 
+            const cleanHistory = localHistory.filter(m => ["user", "model"].includes(m.role));
             try{
                 const data = await fetchCompleteData(
                     base_url,
                     selectedMediaType,
                     userPrompt,
-                    localHistory,
+                    cleanHistory,
                     controller.signal
                 );
 
@@ -125,16 +132,26 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                     : data;
 
                 if(content){
-                    console.log("messages1: ", messages);
-
                     setMessages(prev => [...prev.slice(0, -1), {role:"model", text:content} ])
                 }
             }catch(err:any){
+
+                if(err.name === 'AbortError' || err.message === 'Aborted'){
+                    console.log("You stopped this response");
+                    
+                    setMessages((prev:Message[])=>{
+                        if (!prev.length) return prev;
+                        return [...prev, { role:"system", text:"You stopped this response" }];
+                    });
+                    return;
+                }
+
                 console.log("Error: ", err);
-                setMessages((prev:Message[])=>{
-                    const lastItemRemoved = prev.slice(0,-1);
-                    return [...lastItemRemoved, { role:"model", text:"Sorry, I ran into an issue. Please try again."}]
-                })
+
+                setMessages((prev: Message[]) => [
+                    ...prev.slice(0, -1),
+                    { role: "error", text: "Sorry, I ran into an issue. Please try again." }
+                ]);
             }finally{
                 setIsLoading(false);
             }
@@ -142,9 +159,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         }        
 
         return { messages, handleSend, handleStop, isLoading }
-
-
-
+    //SSE
     }else{
 
         const handleStop = () => {
@@ -153,6 +168,22 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 stopStreamRef.current = null;
                 setIsLoading(false);
                 console.log("Stream stopped by user");
+
+                const abortedMessage:Message = {role:"system", text:"You stopped this response"}
+
+                setMessages(prev => {
+
+                    if(!prev.length) return [abortedMessage]
+                    const newPrev = [...prev];
+                    const lastItem = newPrev[newPrev.length - 1];
+
+                    if(lastItem.role === "model"){
+                        newPrev[newPrev.length - 1] = {...lastItem, text:abortedMessage.text};
+                    }else{
+                        return [...newPrev, abortedMessage];
+                    }
+                    return newPrev;
+                });
             }
         };
 
@@ -200,8 +231,4 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         return { messages, handleSend, handleStop, isLoading }
 
     }
-
-    
-     
-
 }

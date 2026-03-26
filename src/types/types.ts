@@ -1,5 +1,5 @@
 export type Message = {
-    role: 'user' | 'model',
+    role: 'user' | 'model' | 'system' | 'error',
     text: string
 }
 

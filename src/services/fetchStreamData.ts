@@ -1,8 +1,6 @@
-import { MEDIA_OPTIONS } from "../config/panelOptions"
-import { ACCEPT_HEADERS, TEMPERATURE } from "../types/constant"
-import type { MediaType, Message } from "../types/types"
-
-
+import { MEDIA_OPTIONS } from "../config/panelOptions";
+import { ACCEPT_HEADERS, TEMPERATURE } from "../types/constant";
+import type { MediaType, Message } from "../types/types";
 
 export async function* fetchStreamData (
     baseURL:string,    
@@ -33,6 +31,9 @@ export async function* fetchStreamData (
 
     try{
         while(true){
+
+            if(signal.aborted) throw new DOMException("Aborted", "AbortError");
+
             const { done, value } = await reader.read();
 
             if(done) break;
@@ -74,7 +75,15 @@ export async function* fetchStreamData (
             }
         }
 
-    }finally{
+    } catch(err:any){
+        if(err.name === 'AbortError' || err.message === 'Aborted'){
+            console.log("Generator level: Abort detected.");
+            throw err;  //Re-throw so handleSend catch block deals with it.
+        }
+        console.error("Actual Stream Failure: ", err);
+        throw err;
+    }
+    finally{
         //Prevents memory, etc.
         reader.releaseLock();
     }
