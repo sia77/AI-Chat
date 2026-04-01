@@ -4,5 +4,5 @@ export type Message = {
 }
 
 export type MediaType = 'json' | 'text';
-export type ResponseTypeLLM = 'stream' | 'complet' | 'sse';
+export type ResponseTypeLLM = 'stream' | 'complete' | 'sse';
 export type PanelMode = 'closed' | 'floating' | 'docked';

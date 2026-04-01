@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import { streamSSE } from "../services/streamSSE";
 import type { MediaType, Message, ResponseTypeLLM } from "../types/types";
-import { RESPONSE_OPTIONS } from "../config/panelOptions";
 import { fetchCompleteData } from "../services/fetchCompleteData";
 import { fetchStreamData } from "../services/fetchStreamData";
+import { RESPONSE_MODE } from "../constants/constant";
 
 export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:MediaType) => {
     const base_url = import.meta.env.VITE_BASE_URL;
@@ -11,17 +11,36 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
     const [isLoading, setIsLoading] = useState(false);
     const stopStreamRef = useRef<(() => void) | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
+    const sseStoppedByUserRef = useRef(false);
+
+    const stopAbortController = () => {
+        if(abortControllerRef.current){
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+            setIsLoading(false);        
+        }
+    };
+
+    const stopSSE = () => {
+        if (stopStreamRef.current) {
+            sseStoppedByUserRef.current = true;
+            stopStreamRef.current(); // This calls sse.close() inside the service
+            stopStreamRef.current = null;
+            setIsLoading(false);
+        }
+    };
+
+    const handleStop = () => {
+        if(selectedResponse === RESPONSE_MODE.SSE){
+            stopSSE();
+            return;
+        }
+        stopAbortController();
+    }
+
 
     //Stream
-    if( selectedResponse === RESPONSE_OPTIONS[0].id ){
-
-        const handleStop = () => {
-            if(abortControllerRef.current){
-                abortControllerRef.current.abort();
-                abortControllerRef.current = null;
-                setIsLoading(false);        
-            }
-        };
+    if( selectedResponse === RESPONSE_MODE.STREAM ){
 
         const handleSend = async(userPrompt:string) =>{
 
@@ -87,21 +106,14 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
 
             }finally{
                 setIsLoading(false);
+                abortControllerRef.current = null;
             }            
         }
 
         return { messages, handleSend, handleStop, isLoading }
 
     //Complete
-    }else if(selectedResponse === RESPONSE_OPTIONS[1].id){
-        
-        const handleStop = () => {
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort(); 
-                abortControllerRef.current = null;
-                setIsLoading(false);               
-            }
-        };
+    }else if(selectedResponse === RESPONSE_MODE.COMPLETE){
         
         const handleSend = async(userPrompt:string) => {
             if(isLoading) return;
@@ -154,6 +166,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 ]);
             }finally{
                 setIsLoading(false);
+                abortControllerRef.current = null;
             }
 
         }        
@@ -161,31 +174,6 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         return { messages, handleSend, handleStop, isLoading }
     //SSE
     }else{
-
-        const handleStop = () => {
-            if (stopStreamRef.current) {
-                stopStreamRef.current(); // This calls sse.close() inside the service
-                stopStreamRef.current = null;
-                setIsLoading(false);
-                console.log("Stream stopped by user");
-
-                const abortedMessage:Message = {role:"system", text:"You stopped this response"}
-
-                setMessages(prev => {
-
-                    if(!prev.length) return [abortedMessage]
-                    const newPrev = [...prev];
-                    const lastItem = newPrev[newPrev.length - 1];
-
-                    if(lastItem.role === "model"){
-                        newPrev[newPrev.length - 1] = {...lastItem, text:abortedMessage.text};
-                    }else{
-                        return [...newPrev, abortedMessage];
-                    }
-                    return newPrev;
-                });
-            }
-        };
 
         const handleSend = (userPrompt:string) => {
             if (isLoading) return;

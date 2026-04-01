@@ -1,8 +1,9 @@
+import { RESPONSE_MODE } from "../constants/constant"
 
 export const RESPONSE_OPTIONS = [
-    { id:'stream', label: 'Stream' },
-    { id:'complete', label: 'Complete' },
-    { id:'sse', label: 'SSE' },
+    { id:RESPONSE_MODE.STREAM, label: 'Stream' },
+    { id:RESPONSE_MODE.COMPLETE, label: 'Complete' },
+    { id:RESPONSE_MODE.SSE, label: 'SSE' },
 ]
 
 export const MEDIA_OPTIONS = [
