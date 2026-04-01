@@ -38,6 +38,37 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         stopAbortController();
     }
 
+    const isAbortError = (err: unknown): boolean => {
+        return (
+            typeof err === "object" &&
+            err !== null &&
+            ("name" in err && err.name === "AbortError" ||
+            "message" in err && err.message === "Aborted")
+        );
+    };
+
+    const appendStoppedMessage = (err:unknown) : boolean => { 
+
+        if(!isAbortError(err)) return false;
+        
+        console.log("You stopped this response");
+        
+        setMessages((prev:Message[])=>{
+            if (!prev.length) return prev;
+            return [...prev, { role:"system", text:"You stopped this response" }];
+        });
+        return true;
+
+    };
+
+    const replaceLastWithError = (err:unknown) => { 
+        console.log("Error: ", err);
+
+        setMessages((prev: Message[]) => [
+            ...prev.slice(0, -1),
+            { role: "error", text: "Sorry, I ran into an issue. Please try again." }
+        ]);
+    };
 
     //Stream
     if( selectedResponse === RESPONSE_MODE.STREAM ){
@@ -87,23 +118,8 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 }
 
             }catch(err:any){
-                if(err.name === 'AbortError' || err.message === 'Aborted'){
-                    console.log("You stopped this response");
-                    
-                    setMessages((prev:Message[])=>{
-                        if (!prev.length) return prev;
-                        return [...prev, { role:"system", text:"You stopped this response" }];
-                    });
-                    return;
-                }
-
-                console.log("Error: ", err);
-
-                setMessages((prev: Message[]) => [
-                    ...prev.slice(0, -1),
-                    { role: "error", text: "Sorry, I ran into an issue. Please try again." }
-                ]);
-
+                const stoppedByUser = appendStoppedMessage(err);
+                if(!stoppedByUser) replaceLastWithError(err);
             }finally{
                 setIsLoading(false);
                 abortControllerRef.current = null;
@@ -147,23 +163,8 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                     setMessages(prev => [...prev.slice(0, -1), {role:"model", text:content} ])
                 }
             }catch(err:any){
-
-                if(err.name === 'AbortError' || err.message === 'Aborted'){
-                    console.log("You stopped this response");
-                    
-                    setMessages((prev:Message[])=>{
-                        if (!prev.length) return prev;
-                        return [...prev, { role:"system", text:"You stopped this response" }];
-                    });
-                    return;
-                }
-
-                console.log("Error: ", err);
-
-                setMessages((prev: Message[]) => [
-                    ...prev.slice(0, -1),
-                    { role: "error", text: "Sorry, I ran into an issue. Please try again." }
-                ]);
+                const stoppedByUser = appendStoppedMessage(err);
+                if(!stoppedByUser) replaceLastWithError(err);
             }finally{
                 setIsLoading(false);
                 abortControllerRef.current = null;
