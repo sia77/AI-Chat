@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import { streamSSE } from "../services/streamSSE";
-import type { MediaType, Message, ResponseTypeLLM } from "../types/types";
+import type { MediaType, Message, ResponseTypeLLM } from "../shared/types";
 import { fetchCompleteData } from "../services/fetchCompleteData";
 import { fetchStreamData } from "../services/fetchStreamData";
-import { RESPONSE_MODE } from "../constants/constant";
+import { RESPONSE_MODE } from "../shared/constant";
 
 export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:MediaType) => {
     const base_url = import.meta.env.VITE_BASE_URL;
@@ -21,13 +21,40 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         }
     };
 
+    const finalizeStoppedResponse = () => {
+        const stoppedMessage: Message = {
+            role: "system",
+            text: "You stopped this response",
+        };
+
+        setMessages((prev) => {
+            if (!prev.length) return [stoppedMessage];
+
+            const lastIndex = prev.length - 1;
+            const lastItem = prev[lastIndex];
+
+            // If model bubble is still empty, replace it
+            if (lastItem.role === "model" && lastItem.text.trim() === "") {
+            const next = [...prev];
+            next[lastIndex] = { ...lastItem, text: "Response stopped." };
+            return next;
+            }
+
+            // If partial content exists, keep it and append system message
+            return [...prev, stoppedMessage];
+        });
+    };
+
     const stopSSE = () => {
-        if (stopStreamRef.current) {
-            sseStoppedByUserRef.current = true;
-            stopStreamRef.current(); // This calls sse.close() inside the service
-            stopStreamRef.current = null;
-            setIsLoading(false);
-        }
+        if (!stopStreamRef.current) return;
+        
+        sseStoppedByUserRef.current = true;
+        stopStreamRef.current(); // This calls sse.close() inside the service
+        stopStreamRef.current = null;
+        setIsLoading(false);
+
+        finalizeStoppedResponse();
+        
     };
 
     const handleStop = () => {
@@ -181,9 +208,11 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
             // KILL any existing stream just in case
             if (stopStreamRef.current) {
                 stopStreamRef.current();
+                stopStreamRef.current = null;
             }
+            sseStoppedByUserRef.current = false;
             setIsLoading(true);        
-            setMessages(prev => [...prev, {role:"user", text:userPrompt}, {role:"model", text:''}]);
+            setMessages(prev => [...prev, {role:"user", text:userPrompt}, {role:"model", text:"..."}]);
             
             //SSE service
             const cleanup = streamSSE(
@@ -193,23 +222,45 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                     onChunk:(text) => {
                         setIsLoading(true);
                         setMessages(prev => {
-                            const lastMessage = prev[prev.length -1];
+                            const lastIndex = prev.length - 1;
+                            const lastMessage = prev[lastIndex];
                             // If for some reason the placeholder isn't there yet, 
                             // we append a new message instead of trying to edit 'undefined'
-                            if (!lastMessage || lastMessage.role !== "model") {
+
+                            if(!lastMessage || lastMessage.role !== "model"){
                                 return [...prev, { role: "model", text: text }];
                             }
-                            const otherMessages = prev.slice(0, -1); //Create shallow copy
-                            return  [...otherMessages, {...lastMessage, text:lastMessage.text+text}];
+
+                            const existingContent = lastMessage.text === "..." ? "":lastMessage.text;
+                            
+                            const updatedMessages = [...prev]
+
+                            updatedMessages[lastIndex] = {
+                                ...lastMessage,
+                                text:existingContent + text
+                            };
+
+                            return updatedMessages;
                         })
                     },
                     onDone: () => {
                         setIsLoading(false);
                         stopStreamRef.current = null;
+                        sseStoppedByUserRef.current = false;
                     },
-                    onError: () => {
+                    onError: (message) => {
                         setIsLoading(false);
                         stopStreamRef.current = null;
+
+                        if(sseStoppedByUserRef.current){
+                            sseStoppedByUserRef.current = false;
+                            return;
+                        }
+
+                        setMessages((prev) => [
+                            ...prev.slice(0, -1),
+                            { role: "error", text: message ||"Connection lost" },
+                        ]);
                     }
                 }
             );

@@ -3,7 +3,7 @@ import { MessageList } from "./MessageList"
 import { useEffect, useState } from "react";
 import { useLLMHook } from "../hooks/useLLMHook";
 import { SidePanel } from "./SidePanel";
-import type { MediaType, PanelMode, ResponseTypeLLM } from "../types/types";
+import type { MediaType, PanelMode, ResponseTypeLLM } from "../shared/types";
 import { useRef } from 'react';
 
 

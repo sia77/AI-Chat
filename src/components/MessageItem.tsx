@@ -2,7 +2,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
-import type { Message } from "../types/types"; 
+import type { Message } from "../shared/types"; 
 
 
 const remarkPlugins = [remarkGfm, remarkBreaks];

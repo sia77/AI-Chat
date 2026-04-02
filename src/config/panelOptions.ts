@@ -1,4 +1,4 @@
-import { RESPONSE_MODE } from "../constants/constant"
+import { RESPONSE_MODE } from "../shared/constant"
 
 export const RESPONSE_OPTIONS = [
     { id:RESPONSE_MODE.STREAM, label: 'Stream' },

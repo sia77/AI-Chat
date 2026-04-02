@@ -1,5 +1,5 @@
-import { ACCEPT_HEADERS, TEMPERATURE } from "../types/constant";
-import type { MediaType, Message } from "../types/types";
+import { ACCEPT_HEADERS, TEMPERATURE } from "../shared/constant";
+import type { MediaType, Message } from "../shared/types";
 
 
 export const fetchCompleteData = async(

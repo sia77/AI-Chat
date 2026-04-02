@@ -1,7 +1,7 @@
 import { Settings } from 'lucide-react';
 import { RadioGroup } from "./RadioGroup";
 import { MEDIA_OPTIONS, RESPONSE_OPTIONS } from "../config/panelOptions";
-import type { MediaType, PanelMode, ResponseTypeLLM } from "../types/types";
+import type { MediaType, PanelMode, ResponseTypeLLM } from "../shared/types";
 import type { Dispatch, SetStateAction } from 'react';
 
 interface SidePanelProps {

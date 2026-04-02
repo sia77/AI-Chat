@@ -10,34 +10,47 @@ export const streamSSE = (baseURL: string, prompt:string, handlers:SSEHandlers) 
     
     // Here the chat history is not included in the prompt
     const url = `${baseURL}/api/v1/chat/stream/sse?prompt=${encodeURIComponent(prompt)}`;
-
     const sse = new EventSource(url);
+
+    let isClosed = false;
+
+    const safeClose = () => {
+        if (isClosed) return;
+        isClosed = true;
+        sse.close();
+    };
 
     sse.addEventListener("chunk", (e)=> {
         try { 
-            const { text } = JSON.parse(e.data); 
+            const { text } = JSON.parse((e as MessageEvent).data); 
             handlers.onChunk(text); 
         } 
         catch { 
-            handlers.onError?.("Malformed JSON received"); 
+            handlers.onError?.("Malformed JSON received");
+            safeClose(); 
         }
     })
 
     sse.addEventListener("done", ()=> {
-        handlers.onDone?.()
+        handlers.onDone?.();
+        sse.close();
     })
 
     sse.addEventListener("sse_error", (e) =>{
-        const { message } = JSON.parse(e.data); 
-        handlers.onError?.(message);
+        try{
+            const { message } = JSON.parse((e as MessageEvent).data); 
+            handlers.onError?.(message || "Server error");
+        }catch{
+            handlers.onError?.("Server error");
+        }
+        safeClose();
     });
 
     // Built-in connection error 
-    sse.onerror = (err:unknown) => { 
+    sse.onerror = () => { 
         handlers.onError?.("Connection lost"); 
         sse.close(); 
     };
 
     return () => sse.close();
-
 }

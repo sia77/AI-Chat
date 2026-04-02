@@ -1,6 +1,6 @@
 //This version receives the response at once rather than chuncks of streams
 import { useState } from "react";
-import type { Message } from "../types/types";
+import type { Message } from "../shared/types";
     
     export const useCompleteChat = () => {
 

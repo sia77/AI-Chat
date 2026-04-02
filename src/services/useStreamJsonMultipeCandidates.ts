@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { Message } from "../types/types"
+import type { Message } from "../shared/types"
 
 export const UseStreamJsonMultipeCandidates = () => {
   const base_url = import.meta.env.VITE_BASE_URL;

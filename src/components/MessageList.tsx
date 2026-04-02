@@ -1,4 +1,4 @@
-import type { Message } from "../types/types";
+import type { Message } from "../shared/types";
 import { MessageItem } from "./MessageItem";
 import { v4 as uuid } from 'uuid';
 
