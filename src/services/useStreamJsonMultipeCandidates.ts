@@ -2,7 +2,7 @@ import { useState } from "react"
 import type { Message } from "../shared/types"
 
 export const UseStreamJsonMultipeCandidates = () => {
-  const base_url = import.meta.env.VITE_BASE_URL;
+  const baseUrl = import.meta.env.VITE_BASE_URL;
   const [messages, setMessages] = useState<Message[]>([])
 
   const handleSend = async(message:string) => {
@@ -13,7 +13,7 @@ export const UseStreamJsonMultipeCandidates = () => {
     setMessages(prev => [...prev, {role: 'user', text: message}, {role: 'model', text: '...'}]);
 
     try {
-      const response = await fetch(`${base_url}/api/v1/chat/stream/json`, {
+      const response = await fetch(`${baseUrl}/api/v1/chat/stream/json`, {
         headers: {"Content-Type": "application/json"},
         method: "POST",
         body: JSON.stringify({prompt: message, temperature: 0.7, history: localHistory})

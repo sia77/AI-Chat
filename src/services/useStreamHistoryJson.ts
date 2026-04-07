@@ -3,7 +3,7 @@ import { useState } from "react"
 import type { Message } from "../shared/types"
 
 export const UseStreamHistoryJson = () => {
-    const base_url = import.meta.env.VITE_BASE_URL;
+    const baseUrl = import.meta.env.VITE_BASE_URL;
     const [messages, setMessages] = useState<Message[]>([])
 
     const handleSend = async(message:string) => {
@@ -11,7 +11,7 @@ export const UseStreamHistoryJson = () => {
         setMessages(prevMsg => [...prevMsg, {role:'user', text:message}])
 
         try {
-            const response = await fetch(`${base_url}/api/v1/chat/stream/json`, {
+            const response = await fetch(`${baseUrl}/api/v1/chat/stream/json`, {
                 headers: {"Content-Type": "application/json"},
                 method: "POST",
                 body: JSON.stringify({prompt:message, temperature:0.7, history:messages })

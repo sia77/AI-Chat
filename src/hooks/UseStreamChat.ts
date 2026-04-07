@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { Message } from "../shared/types";
 
 export const useStreamChat = () => {
-    const base_url = import.meta.env.VITE_BASE_URL;
+    const baseUrl = import.meta.env.VITE_BASE_URL;
     const [messages, setMessages] = useState<Message[]>([]);
 
 
@@ -13,7 +13,7 @@ export const useStreamChat = () => {
 
         try {
             console.log("Messages: ", messages);
-            const response = await fetch(`${base_url}/api/chat/stream`, {
+            const response = await fetch(`${baseUrl}/api/chat/stream`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt: message, temperature: 0.7 }),
