@@ -1,7 +1,7 @@
 
 
 export const IsServiceUp = async( baseURL: string ) =>{
-    console.log("Did you call me?");
+    console.info("Calling Server...");
 
     try{
         const response = await fetch(`${baseURL}/api/v1/chat/`);

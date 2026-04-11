@@ -8,8 +8,6 @@ export const ServerStatus = ({isServerLive}:ServerStatusProps) => {
 
     if(isServerLive) return null;
 
-    console.log("isServerLive: ", isServerLive);
-
     return (
         <div className="flex items-center justify-center h-screen">
             <div className="z-50 rounded bg-black/10 p-[30px] flex flex-col items-center gap-4">
