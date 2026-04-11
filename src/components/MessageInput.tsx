@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { SendButton } from "./SendButton";
 
 type MessageInputProps = {
   onSend: (message: string) => void;
   isLoading: boolean;
   handleStop: () => void;
+  isServerLive:boolean
 };
 
-export const MessageInput = ({onSend, isLoading, handleStop}:MessageInputProps) => {
+export const MessageInput = ({onSend, isLoading, handleStop, isServerLive}:MessageInputProps) => {
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+    const isDisabled = !isServerLive || isLoading;
 
     const [message, setMessage] = useState("");
+
+    useEffect(()=> {
+
+        if(isServerLive && !isLoading)
+        textAreaRef.current?.focus();
+
+    }, [isServerLive, isLoading])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -36,13 +47,20 @@ export const MessageInput = ({onSend, isLoading, handleStop}:MessageInputProps) 
         ">
             <div className="relative w-full max-w-[800px]">
                 <textarea
-                className="
-                    w-full h-[100px]
+                ref={textAreaRef}
+                disabled = {isDisabled}
+                className={
+                    `w-full h-[100px]
                     p-3 pr-12  
                     rounded bg-white shadow
                     focus:outline-none
                     resize-none
-                "
+                    ${isDisabled 
+                        ? "bg-gray-100 cursor-not-allowed text-gray-400" 
+                        : "bg-white cursor-text text-black"
+                    }`                    
+                }
+
                 value = { message }
                 onKeyDown={ handleKeyDown }
                 onChange={(e)=> setMessage(e.target.value)}
@@ -53,7 +71,8 @@ export const MessageInput = ({onSend, isLoading, handleStop}:MessageInputProps) 
                     <SendButton 
                         onClick = {handleSend} 
                         isLoading = {isLoading} 
-                        onStop = {handleStop}  />
+                        onStop = {handleStop} 
+                        isDisabled = {isDisabled} />
                 </div>
             </div>
         </div>

@@ -13,6 +13,11 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
     const abortControllerRef = useRef<AbortController | null>(null);
     const sseStoppedByUserRef = useRef(false);
     const activeModeRef = useRef<ResponseTypeLLM | null>(null);
+    const messagesRef = useRef<Message[]>([]);
+
+    useEffect(()=> {
+        messagesRef.current = messages; //It holds a copy of messages as per latest commited render
+    }, [messages])
 
     useEffect(() => {
         return () => {
@@ -22,8 +27,8 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
             }
 
             if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-            abortControllerRef.current = null;
+                abortControllerRef.current.abort();
+                abortControllerRef.current = null;
             }
         };
     }, []);
@@ -37,7 +42,8 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         activeModeRef.current = null;
     };
 
-    const finalizeStoppedResponse = () => {
+
+    const appendUserAbortMessage = () => {
         const stoppedMessage: Message = {
             role: "system",
             text: "You stopped this response",
@@ -48,7 +54,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
             // If partial content exists, keep it and append system message
             return [...prev, stoppedMessage];
         });
-    };
+    }
 
     const stopSSE = () => {
         if (!stopStreamRef.current) return;
@@ -57,7 +63,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         stopStreamRef.current(); // This calls sse.close() inside the service
         stopStreamRef.current = null;
         setIsLoading(false);
-        finalizeStoppedResponse();
+        appendUserAbortMessage();
         activeModeRef.current = null;        
     };
 
@@ -70,26 +76,14 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
     }
 
     const isAbortError = (err: unknown): boolean => {
+        if (typeof err !== "object" || err === null) return false;
+
+        const maybeErr = err as { name?: unknown; message?: unknown };
+
         return (
-            typeof err === "object" &&
-            err !== null &&
-            ("name" in err && err.name === "AbortError" ||
-            "message" in err && err.message === "Aborted")
+            maybeErr.name === "AbortError" ||
+            maybeErr.message === "Aborted"
         );
-    };
-
-    const appendStoppedMessage = (err:unknown) : boolean => { 
-
-        if(!isAbortError(err)) return false;
-        
-        console.log("You stopped this response");
-        
-        setMessages((prev:Message[])=>{
-            if (!prev.length) return prev;
-            return [...prev, { role:"system", text:"You stopped this response" }];
-        });
-        return true;
-
     };
 
     const replaceLastWithError = (err:unknown) => { 
@@ -113,7 +107,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         
         setMessages((prev:Message[])=> [...prev, newMessage, botPlaceholder]);            
         
-        const localHistory:Message[] = [...messages, newMessage ];
+        const localHistory:Message[] = [...messagesRef.current, newMessage ];
         const cleanHistory = localHistory.filter(m => ["user", "model"].includes(m.role));
         setIsLoading(true);
 
@@ -146,8 +140,14 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
             }
 
         }catch(err:unknown){
-            const stoppedByUser = appendStoppedMessage(err);
-            if(!stoppedByUser) replaceLastWithError(err);
+
+            if(isAbortError(err)){
+                console.log("You stopped this response");
+                appendUserAbortMessage()
+                return;
+            }
+            replaceLastWithError(err);
+
         }finally{
             setIsLoading(false);
             abortControllerRef.current = null;
@@ -168,7 +168,7 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         const botPlaceholder:Message = { role:"model", text:"..." };
         
         setMessages(prev => [...prev, newMessage, botPlaceholder]);
-        const localHistory:Message[] = [...messages, newMessage];
+        const localHistory:Message[] = [...messagesRef.current, newMessage];
 
         const cleanHistory = localHistory.filter(m => ["user", "model"].includes(m.role));
         try{
@@ -188,8 +188,12 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 setMessages(prev => [...prev.slice(0, -1), {role:"model", text:content} ])
             }
         }catch(err:unknown){
-            const stoppedByUser = appendStoppedMessage(err);
-            if(!stoppedByUser) replaceLastWithError(err);
+            if(isAbortError(err)){
+                console.log("You stopped this response");
+                appendUserAbortMessage()
+                return;
+            }
+            replaceLastWithError(err);
         }finally{
             setIsLoading(false);
             abortControllerRef.current = null;

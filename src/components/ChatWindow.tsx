@@ -5,7 +5,8 @@ import { useLLMHook } from "../hooks/useLLMHook";
 import { SidePanel } from "./SidePanel";
 import type { MediaType, PanelMode, ResponseTypeLLM } from "../shared/types";
 import { useRef } from 'react';
-
+import { useServerHealth } from "../hooks/useServerHealth";
+import { ServerStatus } from "./ServerStatus";
 
 export const ChatWindow = () => {
     const [selectedResponse, setSelectedResponse] = useState<ResponseTypeLLM>('stream');
@@ -13,6 +14,7 @@ export const ChatWindow = () => {
     const {messages, handleSend, handleStop, isLoading } = useLLMHook( selectedResponse, selectedMediaType );
     const [panelMode, setPanelMode] = useState<PanelMode>('closed');
     const panelRef = useRef<HTMLDivElement>(null);
+    const isServerLive = useServerHealth();
 
     useEffect(()=>{
 
@@ -44,11 +46,13 @@ export const ChatWindow = () => {
                 
                 {/* <TopMenu /> */}
 
-                <MessageList messageList = {messages} />    
+                <MessageList messageList = {messages} /> 
+                <ServerStatus isServerLive = {isServerLive} />
                 <MessageInput 
                     onSend = {handleSend}
                     isLoading = {isLoading}
-                    handleStop = { handleStop} />                
+                    handleStop = { handleStop}
+                    isServerLive = {isServerLive} />                
             </div>
         </>
 
