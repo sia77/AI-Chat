@@ -34,7 +34,7 @@ export const ChatWindow = () => {
     return (       
 
         <>
-            <div className="flex flex-col h-screen bg-blue-100">
+            <div className="flex flex-col min-h-dvh bg-blue-100">
                 <SidePanel
                     panelRef = {panelRef} 
                     selectedResponseType = {selectedResponse}
