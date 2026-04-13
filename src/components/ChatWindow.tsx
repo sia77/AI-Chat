@@ -47,8 +47,7 @@ export const ChatWindow = () => {
                 
                 {/* <TopMenu /> */}
 
-                <MessageList messageList = {messages} />
-                <DisplayResponseMode /> 
+                <MessageList messageList = {messages} />                 
                 <ServerStatus isServerLive = {isServerLive} />
                 <MessageInput 
                     onSend = {handleSend}
