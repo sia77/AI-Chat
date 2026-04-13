@@ -6,7 +6,7 @@ interface ServerStatusProps {
 
 export const ServerStatus = ({isServerLive}:ServerStatusProps) => {
 
-    if(!isServerLive) return null;
+    if(isServerLive) return null;
 
     return (
         <div className="flex items-center justify-center h-screen">
