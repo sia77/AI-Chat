@@ -7,7 +7,6 @@ import type { MediaType, PanelMode, ResponseTypeLLM } from "../shared/types";
 import { useRef } from 'react';
 import { useServerHealth } from "../hooks/useServerHealth";
 import { ServerStatus } from "./ServerStatus";
-import { DisplayResponseMode } from "./DisplayResponseMode";
 
 export const ChatWindow = () => {
     const [selectedResponse, setSelectedResponse] = useState<ResponseTypeLLM>('stream');
