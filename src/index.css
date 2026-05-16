@@ -51,3 +51,9 @@ body {
   color:gray; */
   display:none;
 }
+
+.menu_container{
+  /* height:20px; */
+  overflow:hidden;
+  width: 150px;
+}

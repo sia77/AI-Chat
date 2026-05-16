@@ -13,4 +13,19 @@ export const fetchModelNameService = async(
         }
 
         return await response.json();
+
+        // // console.lo
+
+        // const sanitized_data = {
+        //     "total_count": data.total_count,
+        //     "models": data.models.map((model:any)=>({
+        //         ...model,
+        //         label: model.display_name
+
+        //     }))
+        // }
+
+        // console.log("sanitized_data:", sanitized_data)
+
+        //return data;
 }

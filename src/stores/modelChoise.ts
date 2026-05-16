@@ -1,15 +1,24 @@
 import { create } from 'zustand';
 //import { persist } from 'zustand/middleware';
 
-export const useModelChoice = create(
+type ModelIdStore = {
+    modelId:string;
+    setModelId:() => void;
+}
+
+export const useModelIdStore = create<ModelIdStore>((set) => ({
+    modelId:"gemini-2.5-flash-lite",
+    setModelId:() => {
+        set({modelId:"gemini-2.5-flash"})
+    },
+}));
+
     // persist({
     //     theme: 'light',
     //     language: 'en',
     //     selectedCategories: [],
 
-    //     //Actions to update state
-    //     setTheme: (theme) => set({theme}),
-    //     setLanguage: (language) => set({language}),
+
 
     //     toggleCategory: (categoryId) =>
     //         set((state) => ({
@@ -18,4 +27,3 @@ export const useModelChoice = create(
     // }
 
     // )
-);
