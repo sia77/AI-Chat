@@ -20,13 +20,10 @@ interface SidePanelProps {
 
 export const SidePanel = ({ ...props }: SidePanelProps) => { 
 
-    const { data, isLoading, isError } = useFetchModelNameService()
-    const modelId = useModelIdStore((state) => state.modelId)
+    const { data, isLoading, isError, error } = useFetchModelNameService();
+    const modelId = useModelIdStore((state) => state.modelId);
     const setModelId = useModelIdStore((state) => state.setModelId);
-
-    if(isLoading) return <div></div>
-    if(isError) return <div></div>
-    
+  
     const handleResponseTypeChange = (responseType:ResponseTypeLLM) => {
 
         props.setSelectedResponseType(responseType)
@@ -75,8 +72,11 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
                         <OptionDisplay
                             groupLabel="Available LLMs" 
                             items={data?.models}
-                            selectedId = {modelId}
-                            onChange = {setModelId} />
+                            selectedId = { modelId }
+                            onChange = { setModelId }
+                            isLoading = { isLoading }
+                            isError = { isError }
+                            error = { error }  />
                     </form>
                 </div>
 

@@ -1,3 +1,4 @@
+import { ThreeDots } from "./ThreeDots";
 
 interface Item {
     label:string;
@@ -9,9 +10,20 @@ interface OptionDisplayProps {
     groupLabel:string;
     selectedId:string;
     onChange: (modelId:string) => void;
+    isLoading:boolean;
+    isError:boolean;
+    error:Error | null;
 }
 
-export const OptionDisplay = ({items, groupLabel, selectedId, onChange}:OptionDisplayProps) => {
+export const OptionDisplay = ({
+    items = [], 
+    groupLabel, 
+    selectedId, 
+    onChange, 
+    isLoading, 
+    isError, 
+    error
+}:OptionDisplayProps) => {
 
     const handleModelSelection = (modelId:string) => {
         onChange(modelId);
@@ -19,9 +31,18 @@ export const OptionDisplay = ({items, groupLabel, selectedId, onChange}:OptionDi
 
     return (
         <div>
-            <p className="font-bold text-xs uppercase text-gray-400 mb-2">{groupLabel}</p>
-
-            <div className="
+            <p className="font-bold text-xs uppercase text-gray-400 mb-2">{groupLabel}</p>            
+            
+            { isLoading && (
+                <div className="flex justify-center items-center w-[50%] pt-4">
+                    <ThreeDots />
+                </div> 
+            )}
+            { isError && error && (
+                <div className="text-xs p-1">{error.message}</div>
+            )}
+            {!isLoading && !isError && (
+                <div className="
                     overflow-hidden 
                     w-[150px]
                     rounded
@@ -43,6 +64,8 @@ export const OptionDisplay = ({items, groupLabel, selectedId, onChange}:OptionDi
                     )
                 }
             </div>
+
+            )}
         </div>
     )
 }
