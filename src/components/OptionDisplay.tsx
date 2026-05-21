@@ -4,18 +4,17 @@ interface Item {
     id:string;
 }
 
-interface Dropdown2Props {
+interface OptionDisplayProps {
     items:Item[];
     groupLabel:string;
-    selectedModelId:string;
-    setModelId: (modelId:string) => void;
+    selectedId:string;
+    onChange: (modelId:string) => void;
 }
 
-export const Dropdown2 = ({items, groupLabel, selectedModelId, setModelId}:Dropdown2Props) => {
+export const OptionDisplay = ({items, groupLabel, selectedId, onChange}:OptionDisplayProps) => {
 
     const handleModelSelection = (modelId:string) => {
-        console.log("modelId: ", modelId)
-        setModelId(modelId);
+        onChange(modelId);
     }
 
     return (
@@ -38,7 +37,7 @@ export const Dropdown2 = ({items, groupLabel, selectedModelId, setModelId}:Dropd
                                     cursor-pointer
                                     rounded 
                                     hover:bg-gray-300
-                                    ${selectedModelId ===item.id ? "bg-gray-300":""}`}
+                                    ${selectedId ===item.id ? "bg-gray-300":""}`}
                                 onClick={() => handleModelSelection(item.id)}>{item.label}</div>
                         )
                     )

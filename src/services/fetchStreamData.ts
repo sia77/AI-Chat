@@ -8,6 +8,7 @@ export async function* fetchStreamData (
     prompt:string,
     history:Message[],
     signal: AbortSignal,
+    model_name:string,
     temperature=TEMPERATURE
 ) {
 
@@ -18,12 +19,27 @@ export async function* fetchStreamData (
                 "Content-Type":"application/json",
                 "X-Format": ACCEPT_HEADERS[mediaType] // Content negotiation
             },
-            body:JSON.stringify({prompt, temperature, history})
+            body:JSON.stringify({prompt, temperature, history, model_name})
         }        
     )
 
+    if(!response.ok){
+        let errorMsg = "An AI provider error occurred.";
+        const status = response.status;
 
-    if (!response.ok || !response.body) throw new Error("Stream failed");
+        try{
+            const errorJson = await response.json();
+
+            if(errorJson?.detail?.message){
+                errorMsg = errorJson.detail.message;
+            }
+        }catch{
+            errorMsg = `Server returned status code ${status}`;
+        }
+        throw {status, message:errorMsg}
+    }
+
+    if (!response.body) throw {status:500, message:"Response body is missing from stream."}
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();

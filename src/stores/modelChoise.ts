@@ -3,27 +3,16 @@ import { create } from 'zustand';
 
 type ModelIdStore = {
     modelId:string;
-    setModelId:() => void;
+    setModelId:(modelId:string) => void;
 }
 
 export const useModelIdStore = create<ModelIdStore>((set) => ({
     modelId:"gemini-2.5-flash-lite",
-    setModelId:() => {
-        set({modelId:"gemini-2.5-flash"})
+    setModelId:(modelId:string) => {
+        
+        set(() => {
+            return {modelId: modelId}
+        })
     },
 }));
 
-    // persist({
-    //     theme: 'light',
-    //     language: 'en',
-    //     selectedCategories: [],
-
-
-
-    //     toggleCategory: (categoryId) =>
-    //         set((state) => ({
-
-    //         }))
-    // }
-
-    // )

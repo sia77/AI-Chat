@@ -4,6 +4,12 @@ import type { MediaType, Message, ResponseTypeLLM } from "../shared/types";
 import { fetchCompleteData } from "../services/fetchCompleteData";
 import { fetchStreamData } from "../services/fetchStreamData";
 import { RESPONSE_MODE } from "../shared/constant";
+import { useModelIdStore } from "../stores/modelChoise";
+
+interface LLMResponseError{
+    message:string;
+    status:number;
+}
 
 export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:MediaType) => {
     const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -14,6 +20,18 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
     const sseStoppedByUserRef = useRef(false);
     const activeModeRef = useRef<ResponseTypeLLM | null>(null);
     const messagesRef = useRef<Message[]>([]);
+    const modelId = useModelIdStore((state) => state.modelId)
+
+    const isLLMResponseError = (err:unknown): err is LLMResponseError => {
+        return(
+            typeof err === "object" &&
+            err !== null &&
+            "status" in err &&
+            "message" in err &&
+            typeof (err as any).status === "number" &&
+            typeof (err as any).message === "string"
+        );
+    }
 
     useEffect(()=> {
         messagesRef.current = messages; //It holds a copy of messages as per latest commited render
@@ -89,15 +107,23 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
     const replaceLastWithError = (err:unknown) => { 
         console.log("Error: ", err);
 
+        let errorText = "Sorry, I ran into an issue. Please try again.";
+
+        if(isLLMResponseError(err)){
+            if(err?.status === 429){
+                errorText = err?.message
+            }
+        }
+
         setMessages((prev: Message[]) => [
             ...prev.slice(0, -1),
-            { role: "error", text: "Sorry, I ran into an issue. Please try again." }
+            { role: "error", text: errorText }
         ]);
     };
 
     const sendStream = async(userPrompt:string) => {
         if(isLoading) return;
-        activeModeRef.current = RESPONSE_MODE.STREAM;
+        activeModeRef.current = RESPONSE_MODE.STREAM;        
 
         const controller = new AbortController();
         abortControllerRef.current = controller;
@@ -116,8 +142,9 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 baseUrl,
                 selectedMediaType,
                 userPrompt,
-                cleanHistory,
-                controller.signal
+                cleanHistory,                
+                controller.signal,
+                modelId
             )
 
             let buffer = "";
@@ -177,7 +204,8 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
                 selectedMediaType,
                 userPrompt,
                 cleanHistory,
-                controller.signal
+                controller.signal,
+                modelId
             );
 
             const content = typeof data === 'object' && data !== null 
@@ -216,7 +244,8 @@ export const useLLMHook = (selectedResponse:ResponseTypeLLM, selectedMediaType:M
         //SSE service
         const cleanup = streamSSE(
             baseUrl,
-            userPrompt, 
+            userPrompt,
+            modelId, 
             { 
                 onChunk:(text) => {
                     setMessages(prev => {

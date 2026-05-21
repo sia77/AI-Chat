@@ -14,8 +14,6 @@ export const fetchModelNameService = async(
 
         return await response.json();
 
-        // // console.lo
-
         // const sanitized_data = {
         //     "total_count": data.total_count,
         //     "models": data.models.map((model:any)=>({

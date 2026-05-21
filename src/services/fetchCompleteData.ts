@@ -8,6 +8,7 @@ export const fetchCompleteData = async(
     prompt:string,
     history:Message[],
     signal: AbortSignal,
+    model_name:string,
     temperature=TEMPERATURE) => {
 
     try{
@@ -18,10 +19,27 @@ export const fetchCompleteData = async(
                 "Content-Type": 'application/json',
                 "X-Format": ACCEPT_HEADERS[mediaType] // Content negotiation
             },
-            body: JSON.stringify({ prompt, temperature, history })
+            body: JSON.stringify({ prompt, temperature, history, model_name })
         });
 
         if(!response.ok){
+            let errorMsg = "An AI provider error occurred.";
+            const status = response.status;
+
+            try{
+                const errorJson = await response.json();
+
+                if(errorJson?.detail?.message){
+                    errorMsg = errorJson.detail.message;
+                }
+
+            }catch{
+                 errorMsg = `Server returned status code ${status}`;
+            }
+            throw {status, message:errorMsg}
+
+
+
             throw new Error("Something went wrong communicating with API")// || `HTTP ${response.status}`);
         }
 

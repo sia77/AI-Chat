@@ -5,7 +5,7 @@ import type { MediaType, PanelMode, ResponseTypeLLM } from "../shared/types";
 import { type Dispatch, type SetStateAction } from 'react';
 import { DisplayResponseMode } from './DisplayResponseMode';
 import { useFetchModelNameService } from '../hooks/useFetchModelNameService';
-import { Dropdown2 } from './Dropdown2';
+import { OptionDisplay } from './OptionDisplay';
 import { useModelIdStore } from '../stores/modelChoise';
 
 interface SidePanelProps {
@@ -21,7 +21,6 @@ interface SidePanelProps {
 export const SidePanel = ({ ...props }: SidePanelProps) => { 
 
     const { data, isLoading, isError, error } = useFetchModelNameService()
-    console.log("data: ", data);
     const modelId = useModelIdStore((state) => state.modelId)
     const setModelId = useModelIdStore((state) => state.setModelId);
 
@@ -36,7 +35,6 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
             props.setSelectedMediaType("json");
         }
     }
-
     
     return (
         <div className="text-left ml-5 mt-3 relative inline-block" ref={props.panelRef}>
@@ -74,11 +72,11 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
                         />
                         <hr className="w-[60%] opacity-10 mt-2 mb-4" />
                         {/* <Dropdown items={data?.models} /> */}
-                        <Dropdown2
+                        <OptionDisplay
                             groupLabel="Available LLMs" 
                             items={data?.models}
-                            selectedModelId = {modelId}
-                            setModelId = {setModelId} />
+                            selectedId = {modelId}
+                            onChange = {setModelId} />
                     </form>
                 </div>
 
