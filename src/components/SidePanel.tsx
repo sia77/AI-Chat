@@ -20,12 +20,12 @@ interface SidePanelProps {
 
 export const SidePanel = ({ ...props }: SidePanelProps) => { 
 
-    const { data } = useFetchModelNameService()
+    const { data, isLoading, isError } = useFetchModelNameService()
     const modelId = useModelIdStore((state) => state.modelId)
     const setModelId = useModelIdStore((state) => state.setModelId);
 
-    // if(isLoading) return <div>Fetching availiable model list</div>
-    // if(isError) return <div>Only default model available: {error.message}</div>
+    if(isLoading) return <div></div>
+    if(isError) return <div></div>
     
     const handleResponseTypeChange = (responseType:ResponseTypeLLM) => {
 
