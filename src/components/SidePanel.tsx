@@ -39,7 +39,7 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
     return (
         <div className="text-left ml-5 mt-3 relative inline-block" ref={props.panelRef}>
             <div
-                className="relative z-10000000" 
+                className="relative z-45" 
                 onClick={() =>
                     props.setPanelMode((prev: PanelMode) =>
                         prev === 'closed' ? 'floating' : 'closed'
@@ -49,7 +49,7 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
                 
             </div>
             <DisplayResponseMode responseType={props.selectedResponseType} mediaType= {props.selectedMediaType} />
-            <div className="relative z-200">
+            <div className="relative z-40">
                 <div className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out pt-10 pl-5 ${
             props.panelMode === 'floating' ? 'translate-x-0' : '-translate-x-full'
             }`} >
