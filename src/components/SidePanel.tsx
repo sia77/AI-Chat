@@ -68,7 +68,6 @@ export const SidePanel = ({ ...props }: SidePanelProps) => {
                             disabledValue={props.selectedResponseType === 'sse' ? 'text' : null}
                         />
                         <hr className="w-[60%] opacity-10 mt-2 mb-4" />
-                        {/* <Dropdown items={data?.models} /> */}
                         <OptionDisplay
                             groupLabel="Available LLMs" 
                             items={data?.models}
