@@ -6,10 +6,15 @@ export type SSEHandlers = {
     onDone?:() => void;
 }
 
-export const streamSSE = (baseURL: string, prompt:string, handlers:SSEHandlers) => {
+export const streamSSE = (
+    baseURL: string, 
+    prompt:string, 
+    model_name:string, 
+    handlers:SSEHandlers
+) => {
     
     // Here the chat history is not included in the prompt
-    const url = `${baseURL}/api/v1/chat/stream/sse?prompt=${encodeURIComponent(prompt)}`;
+    const url = `${baseURL}/api/v1/chat/stream/sse?prompt=${encodeURIComponent(prompt)}&model_name=${encodeURIComponent(model_name)}`;
     const sse = new EventSource(url);
 
     let isClosed = false;
@@ -38,6 +43,7 @@ export const streamSSE = (baseURL: string, prompt:string, handlers:SSEHandlers) 
 
     sse.addEventListener("sse_error", (e) =>{
         try{
+            console.log("Error-hi: ", e)
             const { message } = JSON.parse((e as MessageEvent).data); 
             handlers.onError?.(message || "Server error");
         }catch{
@@ -47,8 +53,9 @@ export const streamSSE = (baseURL: string, prompt:string, handlers:SSEHandlers) 
     });
 
     // Built-in connection error 
-    sse.onerror = () => { 
-        handlers.onError?.("Connection lost"); 
+    sse.onerror = (e) => { 
+        console.log("E:", e);
+        handlers.onError?.("Connection lost***"); 
         sse.close(); 
     };
 

@@ -44,6 +44,7 @@ export const MessageInput = ({onSend, isLoading, handleStop, isServerLive}:Messa
                 h-[150px]
                 flex items-center justify-center
                 px-4
+                shrink-0
         ">
             <div className="relative w-full max-w-[800px]">
                 <textarea

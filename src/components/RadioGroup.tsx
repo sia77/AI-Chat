@@ -1,6 +1,17 @@
- 
+import type { MenuOptions } from "../interface/interface";
 
-export const RadioGroup = ({groupLabel, options, name, current, onChange, disabledValue}:any) => {
+ 
+interface RadioGroupProps {
+    groupLabel:string;
+    options:MenuOptions[];
+    name:string;
+    current:string;
+    onChange: (e:any)=> void;
+    disabledValue?: string | null;
+}
+
+
+export const RadioGroup = ({groupLabel, options, name, current, onChange, disabledValue}:RadioGroupProps) => {
     
     return(
         <div className="">

@@ -34,7 +34,7 @@ export const ChatWindow = () => {
     return (       
 
         <>
-            <div className="flex flex-col h-screen bg-blue-100">
+            <div className="flex flex-col h-full w-screen bg-blue-100 overflow-hidden fixed inset-0">
                 <SidePanel
                     panelRef = {panelRef} 
                     selectedResponseType = {selectedResponse}
@@ -46,7 +46,7 @@ export const ChatWindow = () => {
                 
                 {/* <TopMenu /> */}
 
-                <MessageList messageList = {messages} /> 
+                <MessageList messageList = {messages} />                 
                 <ServerStatus isServerLive = {isServerLive} />
                 <MessageInput 
                     onSend = {handleSend}

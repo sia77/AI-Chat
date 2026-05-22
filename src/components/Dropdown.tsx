@@ -15,6 +15,7 @@ export const Dropdown = ({items}:DropdownProps) => {
     const [open, setOpen] = useState(false);  
 
 
+    console.log("items: ", items);
 
     return(
         <div className="text-right mr-10 mt-3 relative inline-block">
