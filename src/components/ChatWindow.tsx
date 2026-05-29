@@ -44,8 +44,6 @@ export const ChatWindow = () => {
                     panelMode = { panelMode }
                     setPanelMode = {setPanelMode} />
                 
-                {/* <TopMenu /> */}
-
                 <MessageList messageList = {messages} />                 
                 <ServerStatus isServerLive = {isServerLive} />
                 <MessageInput 
